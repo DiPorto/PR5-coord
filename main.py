@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from collections import deque
 from scipy.fft import fft, fftfreq
 
-# --- 1. ГЕНЕРАТОР ДАНИХ ---
+# 1. ГЕНЕРАТОР ДАНИХ
 FS = 50.0
 DURATION = 20.0
 N = int(FS * DURATION)
@@ -18,26 +18,26 @@ np.random.seed(42)
 true_x = np.zeros(N)
 true_y = np.zeros(N)
 
-# Етап 1: Пряма (0-6 с)
+# Етап 1: Пряма
 mask1 = (T < 6)
 true_x[mask1] = 1.5 * T[mask1]
 true_y[mask1] = 1.0 * T[mask1]
 lx, ly = true_x[mask1][-1], true_y[mask1][-1]
 
-# Етап 2: Поворот (6-12 с)
+# Етап 2: Поворот
 mask2 = (T >= 6) & (T < 12)
 dt2 = T[mask2] - 6
 true_x[mask2] = lx + 10 * np.sin(0.5 * dt2)
 true_y[mask2] = ly + 10 * (1 - np.cos(0.5 * dt2))
 lx, ly = true_x[mask2][-1], true_y[mask2][-1]
 
-# Етап 3: Змійка (12-20 с)
+# Етап 3: Змійка
 mask3 = (T >= 12)
 dt3 = T[mask3] - 12
 true_x[mask3] = lx + 2.0 * dt3
 true_y[mask3] = ly + 3.0 * np.sin(2 * np.pi * 0.5 * dt3)
 
-# --- Шум ---
+# Шум
 def add_noise(signal):
     gaussian = np.random.normal(0, NOISE_STD, len(signal))
     outliers = np.zeros(len(signal))
@@ -50,7 +50,7 @@ def add_noise(signal):
 meas_x = add_noise(true_x)
 meas_y = add_noise(true_y)
 
-# --- 2. ФІЛЬТРИ ---
+# 2. ФІЛЬТРИ
 
 class SMAFilter:
     def __init__(self, w):
@@ -91,7 +91,7 @@ class MedianFilter:
         self.q.append(x)
         return np.median(self.q)
 
-# --- 3. ОБРОБКА ПОТОКУ ---
+# 3. ОБРОБКА ПОТОКУ
 
 W_SMA = 20
 A_EMA = 0.1
@@ -108,7 +108,7 @@ for mx, my in zip(meas_x, meas_y):
         out_x.append(fx.update(mx))
         out_y.append(fy.update(my))
 
-# --- 4. ВІЗУАЛІЗАЦІЯ ---
+# 4. ВІЗУАЛІЗАЦІЯ
 fig = plt.figure(figsize=(16, 20))
 gs = fig.add_gridspec(4, 2, height_ratios=[1.5, 1, 1, 1])
 
